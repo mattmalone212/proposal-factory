@@ -2,6 +2,7 @@
  * This is an example of how to create a static template that uses getStaticProps to retrieve data.
  */
 import * as React from "react";
+import { useState } from "react";
 import { fetch } from "@yext/pages/util";
 import "../index.css";
 import {
@@ -15,6 +16,14 @@ import {
   TemplateRenderProps,
 } from "@yext/pages";
 import Favicon from "../public/yext-favicon.ico";
+import Input from "../components/Input.tsx"
+import Checkbox from "../components/checkbox.tsx"
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+
+
+
+
 
 /**
  * Not required for static templates, but will contain the stream configuration for
@@ -92,9 +101,124 @@ const Static: Template<TemplateRenderProps> = ({
   // for the site entity, and can be accessed in any template, including static templates. 
   const { _site } = document;
 
+  const [listingsChecked, setListingsChecked] = useState(false);
+  const listingsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setListingsChecked(e.target.checked);
+  };
+
+  const [reviewsChecked, setReviewsChecked] = useState(false);
+  const reviewsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setReviewsChecked(e.target.checked);
+  };
+
+  const [pagesChecked, setPagesChecked] = useState(false);
+  const pagesHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPagesChecked(e.target.checked);
+  };
+
+  const [searchChecked, setSearchChecked] = useState(false);
+  const searchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchChecked(e.target.checked);
+  };
+
+  const [supportSearchChecked, setSupportSearchChecked] = useState(false);
+  const supportSearchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSupportSearchChecked(e.target.checked);
+  };
+
+  const [industrySelection, setIndustrySelection] = useState('');
+
+  const [totalManualActions, setTotalManualActions] = useState(0);
+
+  function handleDropdownChange(event) {
+    setIndustrySelection(event.value)
+    setTotalManualActions(industryLookupTable[industrySelection])
+  }
+
+  const industryLookupTable = {
+    "Automotive":42.8,
+    "Education & Nonprofit":16.4,
+    "Financial Services":43.4,
+    "Food Services":249.5,
+    "Healthcare":106.2,
+    "Hospitality":79.4,
+    "Professional & Business Services":28.2,
+    "Public Sector":28.2,
+    "Real Estate":32.4,
+    "Recreation & Entertainment":51.8,
+    "Retail":93.2,
+    "Telecommunications":72.7
+  }
+
+  var myNumber = 0
+
+  if (listingsChecked) {
+    myNumber = myNumber + 3
+  }
+
+  if (pagesChecked) {
+    myNumber = myNumber + 1
+  }
+
+  if (searchChecked) {
+    myNumber = myNumber + 3
+  }
+
+  var totalManualActionsSaved = totalManualActions*myNumber
+
+  const options = [
+    'Automotive', 'Education & Nonprofit', 'Financial Services', 'Food Services', 'Healthcare', 'Hospitality', 'Professional & Business Services', 'Public Sector', 'Real Estate', 'Recreation & Entertainment', 'Retail', 'Telecommunications'
+  ];
+  const defaultOption = 'Choose your Industry';
+
   return (
     <>
-      <h1>Static Page</h1>
+    <div className="p-3" >
+    <h2>Proposal Factory</h2>
+    <br></br>
+      Industry
+      <Dropdown className="max-w-sm" onChange={handleDropdownChange} options={options} value={defaultOption} placeholder="Select an option" />
+      <br></br>
+      Num Locations
+      <Input />
+      <br></br>
+      Avg Transactional Value
+      <Input />
+      <br></br>
+      Yext cost
+      <Input />
+      <br></br>
+      Yext Products
+      <Checkbox
+          handleChange={listingsHandleChange}
+          isChecked={listingsChecked}
+          label="Listings"
+        />
+      <Checkbox
+          handleChange={reviewsHandleChange}
+          isChecked={reviewsChecked}
+          label="Reviews"
+        />
+      <Checkbox
+          handleChange={pagesHandleChange}
+          isChecked={pagesChecked}
+          label="Pages"
+        />
+      <Checkbox
+          handleChange={searchHandleChange}
+          isChecked={searchChecked}
+          label="Search"
+        />
+      <Checkbox
+          handleChange={supportSearchHandleChange}
+          isChecked={supportSearchChecked}
+          label="Support Search"
+        />
+      <br></br>
+      Total Manual Actions Saved:
+      {totalManualActionsSaved}
+    </div>
+
     </>
   );
 };
