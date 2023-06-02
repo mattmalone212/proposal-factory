@@ -3,6 +3,7 @@
  */
 import * as React from "react";
 import { useState } from "react";
+import { useEffect } from 'react';
 import { fetch } from "@yext/pages/util";
 import "../index.css";
 import {
@@ -101,39 +102,9 @@ const Static: Template<TemplateRenderProps> = ({
   // for the site entity, and can be accessed in any template, including static templates. 
   const { _site } = document;
 
-  const [listingsChecked, setListingsChecked] = useState(false);
-  const listingsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setListingsChecked(e.target.checked);
-  };
+  const options = ['Automotive', 'Education & Nonprofit', 'Financial Services', 'Food Services', 'Healthcare', 'Hospitality', 'Professional & Business Services', 'Public Sector', 'Real Estate', 'Recreation & Entertainment', 'Retail', 'Telecommunications'];
 
-  const [reviewsChecked, setReviewsChecked] = useState(false);
-  const reviewsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setReviewsChecked(e.target.checked);
-  };
-
-  const [pagesChecked, setPagesChecked] = useState(false);
-  const pagesHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPagesChecked(e.target.checked);
-  };
-
-  const [searchChecked, setSearchChecked] = useState(false);
-  const searchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchChecked(e.target.checked);
-  };
-
-  const [supportSearchChecked, setSupportSearchChecked] = useState(false);
-  const supportSearchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSupportSearchChecked(e.target.checked);
-  };
-
-  const [industrySelection, setIndustrySelection] = useState('');
-
-  const [totalManualActions, setTotalManualActions] = useState(0);
-
-  function handleDropdownChange(event) {
-    setIndustrySelection(event.value)
-    setTotalManualActions(industryLookupTable[industrySelection])
-  }
+  const defaultOption = 'Choose your Industry';
 
   const industryLookupTable = {
     "Automotive":42.8,
@@ -150,26 +121,91 @@ const Static: Template<TemplateRenderProps> = ({
     "Telecommunications":72.7
   }
 
-  var myNumber = 0
+  const [listingsChecked, setListingsChecked] = useState(false);
+  const listingsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setListingsChecked(e.target.checked);
+    multiplierHandleChange();
+  };
 
-  if (listingsChecked) {
-    myNumber = myNumber + 3
+  const [reviewsChecked, setReviewsChecked] = useState(false);
+  const reviewsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setReviewsChecked(e.target.checked);
+  };
+
+  const [pagesChecked, setPagesChecked] = useState(false);
+  const pagesHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPagesChecked(e.target.checked);
+    multiplierHandleChange();
+  };
+
+  const [searchChecked, setSearchChecked] = useState(false);
+  const searchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchChecked(e.target.checked);
+    multiplierHandleChange()
+  };
+
+  const [supportSearchChecked, setSupportSearchChecked] = useState(false);
+  const supportSearchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSupportSearchChecked(e.target.checked);
+  };
+
+
+  const [multiplier, setMultiplier] = useState(0);
+  const multiplierHandleChange = () => {
+
+    var myNumber = 0
+
+    if (listingsChecked) {
+      myNumber = myNumber + 3
+    }
+  
+    if (pagesChecked) {
+      myNumber = myNumber + 1
+    }
+  
+    if (searchChecked) {
+      myNumber = myNumber + 3
+    }
+
+    setMultiplier(myNumber)
+
+    console.log(multiplier)
+
+    totalManualActionsHandleChange()
   }
 
-  if (pagesChecked) {
-    myNumber = myNumber + 1
-  }
+  const [industrySelected, setIndustrySelected] = useState('');
+  const industrySelectionHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIndustrySelected(e.value);
+    totalManualActionsHandleChange();
+  };
 
-  if (searchChecked) {
-    myNumber = myNumber + 3
-  }
+  const [totalManualActionsSaved, setTotalManualActionsSaved] = useState(0);
+  const totalManualActionsHandleChange = () => {
+    console.log('hi')
+    setTotalManualActionsSaved(industryLookupTable[industrySelected] * multiplier);
+  };
 
-  var totalManualActionsSaved = totalManualActions*myNumber
+  // const [industrySelection, setIndustrySelection] = useState('');
+  // const industrySelectionHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setIndustrySelection(e.value);
+  // };
 
-  const options = [
-    'Automotive', 'Education & Nonprofit', 'Financial Services', 'Food Services', 'Healthcare', 'Hospitality', 'Professional & Business Services', 'Public Sector', 'Real Estate', 'Recreation & Entertainment', 'Retail', 'Telecommunications'
-  ];
-  const defaultOption = 'Choose your Industry';
+  // const [totalManualActionsSaved, setTotalManualActionsSaved] = useState(0);
+  // const totalManualActionsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setTotalManualActionsSaved(industryLookupTable[e.value]*myNumber);
+  // };
+
+  // const [totalManualActions, setTotalManualActions] = useState(0);
+
+  // const [totalManualActionsSaved, setTotalManualActionsSaved] = useState(0);
+
+
+
+  // function handleDropdownChange(event) {
+  //   setIndustrySelection(event.value)
+  //   setTotalManualActionsSaved(industryLookupTable[industrySelection]*myNumber)
+  // }
 
   return (
     <>
@@ -177,7 +213,7 @@ const Static: Template<TemplateRenderProps> = ({
     <h2>Proposal Factory</h2>
     <br></br>
       Industry
-      <Dropdown className="max-w-sm" onChange={handleDropdownChange} options={options} value={defaultOption} placeholder="Select an option" />
+      <Dropdown className="max-w-sm" onChange={industrySelectionHandleChange} options={options} value={defaultOption} placeholder="Select an option" />
       <br></br>
       Num Locations
       <Input />
@@ -215,8 +251,7 @@ const Static: Template<TemplateRenderProps> = ({
           label="Support Search"
         />
       <br></br>
-      Total Manual Actions Saved:
-      {totalManualActionsSaved}
+      Total Manual Actions Saved: {totalManualActionsSaved}
     </div>
 
     </>
