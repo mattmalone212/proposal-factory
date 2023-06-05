@@ -17,7 +17,6 @@ import {
   TemplateRenderProps,
 } from "@yext/pages";
 import Favicon from "../public/yext-favicon.ico";
-import Input from "../components/Input.tsx"
 import Checkbox from "../components/checkbox.tsx"
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -182,30 +181,30 @@ const Static: Template<TemplateRenderProps> = ({
 
   const [totalManualActionsSaved, setTotalManualActionsSaved] = useState(0);
   const totalManualActionsHandleChange = () => {
-    console.log('hi')
-    setTotalManualActionsSaved(industryLookupTable[industrySelected] * multiplier);
+    setTotalManualActionsSaved(Math.ceil(industryLookupTable[industrySelected] * multiplier * 100) / 100);
+    setTotalOperationalValue(Math.ceil(industryLookupTable[industrySelected] * multiplier * 2.08 * 100) / 100)
   };
 
-  // const [industrySelection, setIndustrySelection] = useState('');
-  // const industrySelectionHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setIndustrySelection(e.value);
-  // };
+  const [totalOperationalValue, setTotalOperationalValue] = useState(0);
 
-  // const [totalManualActionsSaved, setTotalManualActionsSaved] = useState(0);
-  // const totalManualActionsHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setTotalManualActionsSaved(industryLookupTable[e.value]*myNumber);
-  // };
+  const [numberOfLocations, setNumberOfLocations] = useState(0)
+  const numberOfLocationsHandleChange = (e) => {
+    setNumberOfLocations(Math.ceil((Number(e.target.value))));
+    validateNumber(Math.ceil((Number(e.target.value))))
+    //totalManualActionsHandleChange();
+  };
 
-  // const [totalManualActions, setTotalManualActions] = useState(0);
+  const [numberValidation, setNumberValidation] = useState(true)
+  const validateNumber = (userInput) => {
+    console.log(userInput)
+    if (isNaN(userInput)) {
+      setNumberValidation(false)
+    }
+    else {
+      setNumberValidation(true)
+    }
+  }
 
-  // const [totalManualActionsSaved, setTotalManualActionsSaved] = useState(0);
-
-
-
-  // function handleDropdownChange(event) {
-  //   setIndustrySelection(event.value)
-  //   setTotalManualActionsSaved(industryLookupTable[industrySelection]*myNumber)
-  // }
 
   return (
     <>
@@ -216,13 +215,19 @@ const Static: Template<TemplateRenderProps> = ({
       <Dropdown className="max-w-sm" onChange={industrySelectionHandleChange} options={options} value={defaultOption} placeholder="Select an option" />
       <br></br>
       Num Locations
-      <Input />
+      <br></br>
+      <input className="border-2 border-black-300" type="text" onChange={numberOfLocationsHandleChange} />
+      {!numberValidation && (
+        <div className="text-red-500"> Must be a valid number </div>
+      )}
       <br></br>
       Avg Transactional Value
-      <Input />
+      <br></br>
+      <input className="border-2 border-black-300" type="text" onChange={numberOfLocationsHandleChange} />
       <br></br>
       Yext cost
-      <Input />
+      <br></br>
+      <input className="border-2 border-black-300" type="text" onChange={numberOfLocationsHandleChange} />
       <br></br>
       Yext Products
       <Checkbox
@@ -251,7 +256,33 @@ const Static: Template<TemplateRenderProps> = ({
           label="Support Search"
         />
       <br></br>
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      <br></br>
+      <br></br>
+      <p className="underline" > Operational Value</p>
       Total Manual Actions Saved: {totalManualActionsSaved}
+      <br></br>
+      Cost Saved Per Action: $2.08 (fixed)
+      <br></br>
+      Total Operational Value: ${totalOperationalValue}
+      <br></br>
+      <br></br>
+      <p className="underline" > Marketing Value</p>
+      Number of Locations: {numberOfLocations}
+      <br></br>
+      Total Clicks Driven:
+      <br></br>
+      Cost Per Click: 
+      <br></br>
+      Total Marketing Value:
+      <br></br>
+      <br></br>
+      <p className="underline" > Conversion Value</p>
+      Total Conversions Driven:
+      <br></br>
+      Average Transaction Value: 
+      <br></br>
+      Total Conversion Value:
     </div>
 
     </>
