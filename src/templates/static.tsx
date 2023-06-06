@@ -240,6 +240,21 @@ const Static: Template<TemplateRenderProps> = ({
     "Telecommunications":12
   }
 
+  const searchConversionRateTable = {
+    "Automotive":1,
+    "Education & Nonprofit":2,
+    "Financial Services":3,
+    "Food Services":4,
+    "Healthcare":5,
+    "Hospitality":6,
+    "Professional & Business Services":7,
+    "Public Sector":8,
+    "Real Estate":9,
+    "Recreation & Entertainment":10,
+    "Retail":11,
+    "Telecommunications":12
+  }
+
 /* Handling User Inputs */
 
   const [industrySelected, setIndustrySelected] = useState('');
@@ -254,7 +269,7 @@ const Static: Template<TemplateRenderProps> = ({
   const numberOfLocationsHandleChange = (e) => {
     setNumberOfLocations(Math.ceil((Number(e.target.value))));
     validateNumberOfLocations(Math.ceil((Number(e.target.value))));
-    totalClicksDrivenHandleChange(e.target.value);
+    totalClicksDrivenHandleChange(Math.ceil((Number(e.target.value))));
   };
 
   const [averageTransactionalValue, setAverageTransactionalValue] = useState(0)
@@ -265,6 +280,12 @@ const Static: Template<TemplateRenderProps> = ({
   const [yextCost, setYextCost] = useState(0)
   const yextCostHandleChange = (e) => {
     validateYextCost(Math.ceil((Number(e.target.value))));
+  };
+
+  const [totalPageViews, setTotalPageViews] = useState(0)
+  const pageViewsHandleChange = (e) => {
+    validateTotalPageViews(Math.ceil((Number(e.target.value))));
+    totalConversionsDrivenHandleChange(Math.ceil((Number(e.target.value))))
   };
 
   const [listingsChecked, setListingsChecked] = useState(false);
@@ -301,7 +322,6 @@ const Static: Template<TemplateRenderProps> = ({
 
   const [numberOfLocationsIsValid, setNumberOfLocationsIsValid] = useState(true)
   const validateNumberOfLocations = (userInput) => {
-    console.log(userInput)
     if (isNaN(userInput)) {
       setNumberOfLocationsIsValid(false)
     }
@@ -312,7 +332,6 @@ const Static: Template<TemplateRenderProps> = ({
 
   const [averageTransactionalValueIsValid, setAverageTransactionalValueIsValid] = useState(true)
   const validateAverageTransactionalValue = (userInput) => {
-    console.log(userInput)
     if (isNaN(userInput)) {
       setAverageTransactionalValueIsValid(false)
     }
@@ -323,12 +342,21 @@ const Static: Template<TemplateRenderProps> = ({
 
   const [yextCostIsValid, setYextCostIsValid] = useState(true)
   const validateYextCost = (userInput) => {
-    console.log(userInput)
     if (isNaN(userInput)) {
       setYextCostIsValid(false)
     }
     else {
       setYextCostIsValid(true)
+    }
+  }
+
+  const [totalPageViewsIsValid, setTotalPageViewsIsValid] = useState(true)
+  const validateTotalPageViews = (userInput) => {
+    if (isNaN(userInput)) {
+      setTotalPageViewsIsValid(false)
+    }
+    else {
+      setTotalPageViewsIsValid(true)
     }
   }
 
@@ -365,12 +393,10 @@ const Static: Template<TemplateRenderProps> = ({
   const [totalManualActionsSaved, setTotalManualActionsSaved] = useState(0);
   const totalManualActionsHandleChange = (newData : any) => {
     if (typeof (newData) == 'number') {
-      console.log('i got a number so i will update the multiplier as ' + newData)
       setTotalManualActionsSaved(Math.ceil(manualActionsTable[industrySelected] * newData * 100) / 100);
       setTotalOperationalValue(Math.ceil(manualActionsTable[industrySelected] * newData * 2.08 * 100) / 100)
     }
     if (typeof (newData) == 'string') {
-      console.log('i got a string so i will update the industry as ' + newData)
       setTotalManualActionsSaved(Math.ceil(manualActionsTable[newData] * multiplier * 100) / 100);
       setTotalOperationalValue(Math.ceil(manualActionsTable[newData] * multiplier * 2.08 * 100) / 100)
     }
@@ -382,8 +408,7 @@ const Static: Template<TemplateRenderProps> = ({
   /* Calculating Marketing Value */
 
   const [totalClicksDriven, setTotalClicksDriven] = useState(0)
-  const totalClicksDrivenHandleChange = (update) => {
-
+  const totalClicksDrivenHandleChange = (update : any) => {
     var listingsClicksDriven = 0
     var reviewsClicksDriven = 0
     var pagesClicksDriven = 0
@@ -393,7 +418,6 @@ const Static: Template<TemplateRenderProps> = ({
         var listingsActions : number = listingsActionsTable[industrySelected]
         var yextListingsImprovement : number = yextListingsImprovementTable[industrySelected]
         listingsClicksDriven = listingsActions * yextListingsImprovement * update
-        console.log("the number of listings clicks driven is" + listingsClicksDriven)
       }
   
       if(reviewsChecked) {
@@ -407,6 +431,7 @@ const Static: Template<TemplateRenderProps> = ({
         var yextPagesImprovement = yextPagesImprovementTable[industrySelected]
         pagesClicksDriven = pageViews * yextPagesImprovement * update
       }
+      totalConversionsDrivenHandleChange(listingsClicksDriven + "," + reviewsClicksDriven + "," + pagesClicksDriven)
     }
 
     if (typeof(update) == 'string' && !update.includes(',')) { // i.e. the industry has changed
@@ -414,7 +439,6 @@ const Static: Template<TemplateRenderProps> = ({
         var listingsActions : number = listingsActionsTable[update]
         var yextListingsImprovement : number = yextListingsImprovementTable[update]
         listingsClicksDriven = listingsActions * yextListingsImprovement * numberOfLocations
-        console.log("the number of listings clicks driven is" + listingsClicksDriven)
       }
   
       if(reviewsChecked && update != 'Reviews,false') {
@@ -428,16 +452,14 @@ const Static: Template<TemplateRenderProps> = ({
         var yextPagesImprovement = yextPagesImprovementTable[update]
         pagesClicksDriven = pageViews * yextPagesImprovement * numberOfLocations
       }
+      totalConversionsDrivenHandleChange(listingsClicksDriven + "," + reviewsClicksDriven + "," + pagesClicksDriven + "," + update) // we do this so that the next function knows the industry change
     }
 
     if (typeof(update) == 'string' && update.includes(',')) { // i.e. a product has been checked or unchecked
       if((listingsChecked && update != 'Listings,false') || update == 'Listings,true') {
         var listingsActions : number = listingsActionsTable[industrySelected]
-        console.log('listingsActions= ' + listingsActions)
         var yextListingsImprovement : number = yextListingsImprovementTable[industrySelected]
-        console.log('yext listings improvement = ' + yextListingsImprovement)
         listingsClicksDriven = listingsActions * yextListingsImprovement * numberOfLocations
-        console.log("the number of listings clicks driven is" + listingsClicksDriven)
       }
   
       if((reviewsChecked && update != 'Reviews,false') || update == 'Reviews,true') {
@@ -451,10 +473,10 @@ const Static: Template<TemplateRenderProps> = ({
         var yextPagesImprovement = yextPagesImprovementTable[industrySelected]
         pagesClicksDriven = pageViews * yextPagesImprovement * numberOfLocations
       }
+      totalConversionsDrivenHandleChange(listingsClicksDriven + "," + reviewsClicksDriven + "," + pagesClicksDriven)
     }
     setTotalClicksDriven(listingsClicksDriven + reviewsClicksDriven + pagesClicksDriven);
     totalMarketingValueHandleChange((listingsClicksDriven + reviewsClicksDriven + pagesClicksDriven).toString());
-    totalConversionsDrivenHandleChange(listingsClicksDriven + "," + reviewsClicksDriven + "," + pagesClicksDriven)
   }
 
 
@@ -483,15 +505,32 @@ const Static: Template<TemplateRenderProps> = ({
   // i think we have to update what this below function receives from total clicks driven so that we know if there's an industry change
   // we also have to add search into it
 
+  const [totalConversionsDrivenWithoutSearch, setTotalConversionsDrivenWithoutSearch] = useState(0)
+  const [totalConversionsDrivenWithSearch, setTotalConversionsDrivenWithSearch] = useState(0)
   const [totalConversionsDriven, setTotalConversionsDriven] = useState(0)
-  const totalConversionsDrivenHandleChange = (update) => {
-    if (update.includes('industry')) { // if the industry has just changed
+  const totalConversionsDrivenHandleChange = (update : any) => { 
+    //var totalConversionsWithoutSearch = 0
+    //var totalConversionsWithSearch = 0
+    console.log(update)
+    if (update.indexOf(',') > -1) { // something other than total page views has been edited
+      var subUpdates = update.split(',')
+      if (subUpdates.length == 4) { // i.e. there has been an industry update and the industry = subUpdates[3]
+        var totalConversionsWithoutSearch = subUpdates[0]*listingsActionConversionRateTable[subUpdates[3]] + subUpdates[1]*listingsActionConversionRateTable[subUpdates[3]] + subUpdates[2]*pageViewConversionRateTable[subUpdates[3]]
+        setTotalConversionsDrivenWithoutSearch(totalConversionsWithoutSearch)
+        setTotalConversionsDriven(totalConversionsWithoutSearch + totalConversionsDrivenWithSearch)
+      }
+      if (subUpdates.legnth == 3) { // no industry update
+        var totalConversionsWithoutSearch = subUpdates[0]*listingsActionConversionRateTable[industrySelected] + subUpdates[1]*listingsActionConversionRateTable[industrySelected] + subUpdates[2]*pageViewConversionRateTable[industrySelected]
+        setTotalConversionsDrivenWithoutSearch(totalConversionsWithoutSearch)
+        setTotalConversionsDriven(totalConversionsWithoutSearch + totalConversionsDrivenWithSearch)
+      }
+    }
+    // if (!(update.includes(','))) { // total page views has changed
+    //   var totalConversionsWithSearch = update * .1 * searchConversionRateTable[industrySelected] * .15
+    //   setTotalConversionsDrivenWithSearch(totalConversionsWithSearch)
+    //   setTotalConversionsDriven(totalConversionsDrivenWithoutSearch + totalConversionsWithSearch)
+    // }
 
-    }
-    else { // if the industry has not just changed
-      var byProduct = update.split(',')
-      var totalConversionsWithoutSearch = byProduct[0]*listingsActionConversionRateTable[industrySelected] + byProduct[1]*listingsActionConversionRateTable[industrySelected] + byProduct[2]*pageViewConversionRateTable[industrySelected]
-    }
   }
 
 
@@ -545,6 +584,16 @@ const Static: Template<TemplateRenderProps> = ({
           isChecked={searchChecked}
           label="Search"
         />
+      {searchChecked && (
+        <div>
+        <p> Total Page Views </p>
+        <input className="border-2 border-black-300" type="text" onChange={pageViewsHandleChange} />
+          {!totalPageViewsIsValid && (
+          <p className="text-red-500"> Must be a valid number </p>
+        )}
+        </div>
+      )}
+      
       <Checkbox
           handleChange={supportSearchHandleChange}
           isChecked={supportSearchChecked}
@@ -571,7 +620,7 @@ const Static: Template<TemplateRenderProps> = ({
       <br></br>
       <br></br>
       <p className="underline" > Conversion Value</p>
-      Total Conversions Driven:
+      Total Conversions Driven: ${totalConversionsDriven}
       <br></br>
       Average Transaction Value: 
       <br></br>
